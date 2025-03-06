@@ -1,7 +1,10 @@
 import React, { useState } from "react";
-import { db, storage } from "../firebase"; // Firebase yapılandırması
+import { db, storage } from "../firebase";
 import { collection, addDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import ConfirmationModal from "./ConfirmationModal";
+import { notification } from 'antd';
+import "./AddCar.css";
 
 const AddCar = () => {
   const [carData, setCarData] = useState({
@@ -10,8 +13,11 @@ const AddCar = () => {
     model: "",
     transmission: "",
     year: "",
+    quantity: "", 
   });
+
   const [image, setImage] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleChange = (e) => {
     setCarData({ ...carData, [e.target.name]: e.target.value });
@@ -28,26 +34,25 @@ const AddCar = () => {
     try {
       let imageUrl = "";
       if (image) {
-        // Resmi Firebase Storage'a yükle
         const imageRef = ref(storage, `images/${image.name}`);
         await uploadBytes(imageRef, image);
-        // Yüklenen dosyanın URL'sini al
         imageUrl = await getDownloadURL(imageRef);
       }
 
-      // Firestore'a yalnızca imageUrl ekle
       await addDoc(collection(db, "cars"), {
         ...carData,
-        imageUrl, // Firestore'a sadece resmin URL'sini kaydediyoruz
+        imageUrl,
+        quantity: parseInt(carData.quantity, 10),
       });
 
-      alert("Araç başarıyla eklendi!");
+      setIsModalOpen(true);
       setCarData({
         fuel: "",
         imageUrl: "",
         model: "",
         transmission: "",
         year: "",
+        quantity: "",
       });
       setImage(null);
     } catch (error) {
@@ -55,55 +60,103 @@ const AddCar = () => {
     }
   };
 
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleConfirmModal = () => {
+    setIsModalOpen(false);
+    notification.success({
+      message: 'Başarılı!',
+      description: 'Araç başarıyla eklendi.',
+      placement: 'topRight',
+      duration: 3,
+    });
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="p-4 border rounded">
-      <input
-        type="text"
-        name="fuel"
-        placeholder="Yakıt Türü"
-        value={carData.fuel}
-        onChange={handleChange}
-        className="block mb-2"
-        required
+    <div>
+      <form onSubmit={handleSubmit} className="add-car-form">
+        <h2>Yeni Araç Ekle</h2>
+
+        <div className="form-grid">
+          <div className="form-group">
+            <label>Yakıt Türü</label>
+            <input
+              type="text"
+              name="fuel"
+              placeholder="Yakıt Türü"
+              value={carData.fuel}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Model</label>
+            <input
+              type="text"
+              name="model"
+              placeholder="Model"
+              value={carData.model}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Şanzıman</label>
+            <input
+              type="text"
+              name="transmission"
+              placeholder="Şanzıman"
+              value={carData.transmission}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Yıl</label>
+            <input
+              type="number"
+              name="year"
+              placeholder="Yıl"
+              value={carData.year}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Araç Sayısı</label>
+            <input
+              type="number"
+              name="quantity"
+              placeholder="Kaç adet var?"
+              value={carData.quantity}
+              onChange={handleChange}
+              required
+              min="1"
+            />
+          </div>
+
+          <div className="form-group image-upload">
+            <label>Araç Görseli</label>
+            <input type="file" onChange={handleImageChange} accept="image/*" required />
+          </div>
+        </div>
+
+        <button type="submit">Kaydet</button>
+      </form>
+
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onConfirm={handleConfirmModal}
+        message="Araç başarıyla eklendi! Onaylıyor musunuz?"
       />
-      <input
-        type="text"
-        name="model"
-        placeholder="Model"
-        value={carData.model}
-        onChange={handleChange}
-        className="block mb-2"
-        required
-      />
-      <input
-        type="text"
-        name="transmission"
-        placeholder="Şanzıman"
-        value={carData.transmission}
-        onChange={handleChange}
-        className="block mb-2"
-        required
-      />
-      <input
-        type="number"
-        name="year"
-        placeholder="Yıl"
-        value={carData.year}
-        onChange={handleChange}
-        className="block mb-2"
-        required
-      />
-      <input
-        type="file"
-        onChange={handleImageChange}
-        className="block mb-2"
-        accept="image/*"
-        required
-      />
-      <button type="submit" className="bg-blue-500 text-white p-2 rounded">
-        Kaydet
-      </button>
-    </form>
+    </div>
   );
 };
 

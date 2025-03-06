@@ -1,0 +1,97 @@
+.add-car-form {
+    max-width: 600px;
+    margin: 50px auto;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.add-car-form h2 {
+    text-align: center;
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* İki sütunlu düzen */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+/* Küçük ekranlarda tek sütuna düşmesini sağla */
+@media (max-width: 600px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.add-car-form label {
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.add-car-form input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease-in-out;
+    box-sizing: border-box;
+}
+
+/* Input focus efekti */
+.add-car-form input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+}
+
+/* Resim yükleme alanını input gibi hizala */
+.image-upload {
+    display: flex;
+    flex-direction: column;
+    grid-column: span 1; 
+}
+
+/* Resim yükleme inputunu da diğer inputlar gibi yap */
+.image-upload input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease-in-out;
+    box-sizing: border-box;
+}
+
+/* Buton */
+.add-car-form button {
+    width: 100%;
+    padding: 12px;
+    background: #c2230e;
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+    grid-column: span 2;
+    margin-top: 20px;
+}
+
+.add-car-form button:hover {
+    background: #e55831;
+}
